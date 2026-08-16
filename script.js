@@ -2,6 +2,49 @@
   if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; }
   window.scrollTo(0,0);
 
+  var canHover = !!(window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches);
+  var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  // Custom gold cursor (desktop only)
+  if(canHover){
+    document.body.classList.add('has-custom-cursor');
+    var cursorDot = document.createElement('div');
+    cursorDot.className = 'cursor-dot';
+    var cursorRing = document.createElement('div');
+    cursorRing.className = 'cursor-ring';
+    document.body.appendChild(cursorDot);
+    document.body.appendChild(cursorRing);
+    var ringX = 0, ringY = 0, targetX = 0, targetY = 0, cursorPrimed = false;
+    function raiseCursor(){
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
+    }
+    document.addEventListener('mousemove', function(e){
+      targetX = e.clientX; targetY = e.clientY;
+      cursorDot.style.left = targetX+'px';
+      cursorDot.style.top = targetY+'px';
+      if(!cursorPrimed){ ringX = targetX; ringY = targetY; cursorPrimed = true; raiseCursor(); }
+    });
+    document.addEventListener('mouseleave', function(){
+      cursorDot.style.opacity = '0';
+      cursorRing.style.opacity = '0';
+    });
+    (function tick(){
+      ringX += (targetX - ringX) * 0.18;
+      ringY += (targetY - ringY) * 0.18;
+      cursorRing.style.left = ringX+'px';
+      cursorRing.style.top = ringY+'px';
+      requestAnimationFrame(tick);
+    })();
+    var hoverTargets = 'a, button, .map-pin, .map-hub, .net-node, .timeline-num-btn, .chip, .tab-btn, input, textarea';
+    document.addEventListener('mouseover', function(e){
+      if(e.target.closest && e.target.closest(hoverTargets)){ cursorRing.classList.add('hover'); }
+    });
+    document.addEventListener('mouseout', function(e){
+      if(e.target.closest && e.target.closest(hoverTargets)){ cursorRing.classList.remove('hover'); }
+    });
+  }
+
   // Mobile nav toggle
   var navToggle = document.getElementById('navToggle');
   var navLinks = document.getElementById('navLinks');
@@ -184,6 +227,19 @@
     hubG.addEventListener('mouseenter', function(){ showLabel(hub); });
     hubG.addEventListener('click', function(){ showLabel(hub); });
     pinsG.appendChild(hubG);
+
+    // Cursor-driven parallax
+    var parallaxG = document.getElementById('mapParallax');
+    if(parallaxG && canHover && !reduceMotion){
+      var px = 0, py = 0;
+      document.addEventListener('mousemove', function(e){
+        var nx = (e.clientX / window.innerWidth - 0.5) * 2;
+        var ny = (e.clientY / window.innerHeight - 0.5) * 2;
+        px = nx * 16;
+        py = ny * 10;
+        parallaxG.style.transform = 'translate('+px.toFixed(1)+'px,'+py.toFixed(1)+'px)';
+      });
+    }
   }
 
   // Network diagram (network page)
@@ -201,6 +257,24 @@
     ];
     var ncx=210, ncy=210, nr=160;
     var ns = 'http://www.w3.org/2000/svg';
+    var netItems = [];
+    var lockedIndex = 0;
+
+    function renderPanel(d){
+      panel.innerHTML = '<span class="tag">'+d.name+'</span><h3>'+d.title+'</h3><p>'+d.desc+'</p>';
+    }
+    function show(i){
+      netItems.forEach(function(item, ii){
+        item.g.classList.toggle('active', ii===i);
+        item.line.classList.toggle('active', ii===i);
+      });
+      renderPanel(netData[i]);
+    }
+    function lock(i){
+      lockedIndex = i;
+      show(i);
+    }
+
     netData.forEach(function(d, i){
       var angle = (i / netData.length) * Math.PI * 2 - Math.PI/2;
       var x = ncx + nr*Math.cos(angle);
@@ -213,6 +287,7 @@
 
       var g = document.createElementNS(ns,'g');
       g.setAttribute('class','net-node');
+      g.setAttribute('tabindex','0');
       var circle = document.createElementNS(ns,'circle');
       circle.setAttribute('cx',x);circle.setAttribute('cy',y);circle.setAttribute('r',40);
       g.appendChild(circle);
@@ -233,39 +308,35 @@
       if(words.length>1){ text.setAttribute('x',x); text.setAttribute('y',y-2); }
       g.appendChild(text);
       netNodes.appendChild(g);
+      netItems.push({g:g, line:line});
 
-      function activate(){
-        document.querySelectorAll('.net-node').forEach(function(n){n.classList.remove('active');});
-        document.querySelectorAll('.net-line').forEach(function(n){n.classList.remove('active');});
-        g.classList.add('active');
-        line.classList.add('active');
-        panel.innerHTML = '<span class="tag">'+d.name+'</span><h3>'+d.title+'</h3><p>'+d.desc+'</p>';
-      }
-      g.addEventListener('mouseenter', activate);
-      g.addEventListener('click', activate);
-      if(i===0){ activate(); }
+      g.addEventListener('mouseenter', function(){ if(canHover){ show(i); } });
+      g.addEventListener('focus', function(){ show(i); });
+      g.addEventListener('click', function(){ lock(i); });
     });
+
+    var networkHolder = document.querySelector('.network-svg-holder');
+    if(networkHolder){
+      networkHolder.addEventListener('mouseleave', function(){ show(lockedIndex); });
+    }
+    lock(0);
   }
 
   // Timeline (process page)
   var timeBtns = document.querySelectorAll('.timeline-num-btn');
   var timePanels = document.querySelectorAll('.timeline-panel');
   if(timeBtns.length){
+    function selectStep(btn){
+      timeBtns.forEach(function(b){b.classList.remove('active');});
+      timePanels.forEach(function(p){p.classList.remove('active');});
+      btn.classList.add('active');
+      document.querySelector('.timeline-panel[data-panel="'+btn.dataset.step+'"]').classList.add('active');
+    }
     timeBtns.forEach(function(btn){
-      btn.addEventListener('click', function(){
-        timeBtns.forEach(function(b){b.classList.remove('active');});
-        timePanels.forEach(function(p){p.classList.remove('active');});
-        btn.classList.add('active');
-        document.querySelector('.timeline-panel[data-panel="'+btn.dataset.step+'"]').classList.add('active');
-      });
-    });
-    var timelineAuto = setInterval(function(){
-      var active = document.querySelector('.timeline-num-btn.active');
-      var next = active.nextElementSibling || timeBtns[0];
-      next.click();
-    }, 5000);
-    timeBtns.forEach(function(b){
-      b.addEventListener('click', function(){ clearInterval(timelineAuto); });
+      btn.addEventListener('click', function(){ selectStep(btn); });
+      if(canHover){
+        btn.addEventListener('mouseenter', function(){ selectStep(btn); });
+      }
     });
   }
 
