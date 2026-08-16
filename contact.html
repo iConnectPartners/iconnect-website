@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's Connect — iConnect</title>
+<meta name="description" content="Tell us the market. Tell us the product. We'll make the introductions. No reports. No decks. No maybes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'%3E%3Crect width='120' height='60' fill='%23141414'/%3E%3Cpath d='M30,30 C30,10 50,10 60,30 C70,50 90,50 90,30 C90,10 70,10 60,30 C50,50 30,50 30,30 Z' fill='none' stroke='%23C9A227' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body class="bg-black">
+<div class="page-shell">
+
+<nav class="nav">
+  <a href="index.html" class="brand">
+    <svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><path d="M30,30 C30,10 50,10 60,30 C70,50 90,50 90,30 C90,10 70,10 60,30 C50,50 30,50 30,30 Z" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></svg>
+    <span class="word"><span class="i">i</span>Connect</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="about.html">About</a></li>
+    <li><a href="network.html">Network</a></li>
+    <li><a href="partners.html">Partners</a></li>
+    <li><a href="process.html">Process</a></li>
+    <li><a href="contact.html" class="active">Contact</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="contact.html" class="btn btn-gold">Let's Connect</a>
+    <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<main class="page-main">
+  <div class="container contact-grid">
+    <div class="reveal">
+      <p class="eyebrow">Let's Connect</p>
+      <h2 class="h-section" style="margin-bottom:14px;">Let's connect.</h2>
+      <p class="lede" style="margin-bottom:30px;max-width:460px;">Tell us the market and the product — we'll make the introductions. No reports. No decks. No maybes.</p>
+
+      <form class="form-grid" id="contactForm" action="https://formspree.io/f/xdenlpno" method="POST">
+        <div class="form-row">
+          <div class="field"><label for="fName">Name</label><input type="text" id="fName" name="name" required></div>
+          <div class="field"><label for="fEmail">Email</label><input type="email" id="fEmail" name="email" required></div>
+        </div>
+        <div class="field"><label for="fMarket">Which market?</label><input type="text" id="fMarket" name="market" placeholder="e.g. South Africa, Portugal, Malta…" required></div>
+        <div class="field"><label for="fMsg">The product or opportunity</label><textarea id="fMsg" name="message" required></textarea></div>
+        <input type="hidden" name="_subject" value="New iConnect enquiry">
+        <div>
+          <button type="submit" class="btn btn-gold" id="formSubmitBtn">Send To Grant</button>
+          <p class="form-msg" id="formMsg"></p>
+        </div>
+      </form>
+    </div>
+
+    <div class="reveal reveal-delay-2 contact-mini">
+      <div class="row"><div class="k">Founder &amp; Principal Consultant</div><div class="v">Grant Neal</div></div>
+      <div class="row"><div class="k">Email</div><div class="v"><a href="mailto:grant@iconnectpartners.com">grant@iconnectpartners.com</a></div></div>
+      <div class="row"><div class="k">Telephone</div><div class="v"><a href="tel:+35699316869">+356 99316869</a></div></div>
+      <div class="row"><div class="k">LinkedIn</div><div class="v"><a href="https://www.linkedin.com/in/grant-jason-neal-07889126/" target="_blank" rel="noopener">linkedin.com/in/grant-jason-neal</a></div></div>
+      <div class="row"><div class="k">Based</div><div class="v">Malta — available internationally</div></div>
+      <div class="row"><div class="k">Markets</div><div class="v">Malta · South Africa · Portugal · Australia · Africa</div></div>
+    </div>
+  </div>
+</main>
+
+<footer class="page-footer">
+  <div class="container footer-row">
+    <div class="footer-brand-mini">
+      <svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><path d="M30,30 C30,10 50,10 60,30 C70,50 90,50 90,30 C90,10 70,10 60,30 C50,50 30,50 30,30 Z" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></svg>
+      <span><b>iConnect</b> — Connecting markets. Enabling opportunity.</span>
+    </div>
+    <div class="footer-meta">© 2026 iConnect · Malta — available internationally</div>
+  </div>
+</footer>
+
+</div>
+<script src="script.js?v=2"></script>
+</body>
+</html>
