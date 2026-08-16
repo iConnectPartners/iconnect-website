@@ -19,16 +19,21 @@
       cursorDot.style.opacity = '1';
       cursorRing.style.opacity = '1';
     }
+    function hideCursor(){
+      cursorDot.style.opacity = '0';
+      cursorRing.style.opacity = '0';
+    }
     document.addEventListener('mousemove', function(e){
       targetX = e.clientX; targetY = e.clientY;
       cursorDot.style.left = targetX+'px';
       cursorDot.style.top = targetY+'px';
-      if(!cursorPrimed){ ringX = targetX; ringY = targetY; cursorPrimed = true; raiseCursor(); }
+      if(!cursorPrimed){ ringX = targetX; ringY = targetY; cursorPrimed = true; }
+      raiseCursor();
     });
-    document.addEventListener('mouseleave', function(){
-      cursorDot.style.opacity = '0';
-      cursorRing.style.opacity = '0';
+    document.addEventListener('mouseout', function(e){
+      if(!e.relatedTarget){ hideCursor(); }
     });
+    document.addEventListener('mouseenter', raiseCursor);
     (function tick(){
       ringX += (targetX - ringX) * 0.18;
       ringY += (targetY - ringY) * 0.18;

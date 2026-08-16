@@ -37,6 +37,7 @@ input,textarea{font-family:inherit;}
 
 /* ============ CUSTOM CURSOR (desktop only) ============ */
 .has-custom-cursor,.has-custom-cursor a,.has-custom-cursor button{cursor:none;}
+.has-custom-cursor .map-pin,.has-custom-cursor .map-hub,.has-custom-cursor .net-node{cursor:none;}
 .cursor-dot{
   position:fixed;top:0;left:0;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;
   background:var(--gold);pointer-events:none;z-index:9999;opacity:0;transition:opacity .2s;
