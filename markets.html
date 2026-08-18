@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Let's Connect — iConnect</title>
-<meta name="description" content="Tell us the market. Tell us the product. We'll make the introductions. No reports. No decks. No maybes.">
+<title>Our Markets — iConnect</title>
+<meta name="description" content="Malta, South Africa, Portugal, Australia and Africa — select a market to see when iConnect opened it.">
 <link rel="icon" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
   </a>
   <ul class="nav-links" id="navLinks">
     <li><a href="about.html">About</a></li>
-    <li><a href="markets.html">Markets</a></li>
+    <li><a href="markets.html" class="active">Markets</a></li>
     <li><a href="network.html">Network</a></li>
     <li><a href="partners.html">Partners</a></li>
     <li><a href="process.html">Process</a></li>
@@ -33,31 +33,28 @@
 </nav>
 
 <main class="page-main">
-  <div class="container contact-grid">
-    <div class="reveal">
-      <p class="eyebrow">Let's Connect</p>
-      <h2 class="h-section" style="margin-bottom:14px;">Let's connect.</h2>
-      <p class="lede" style="margin-bottom:30px;max-width:460px;">Tell us the market and the product — we'll make the introductions. No reports. No decks. No maybes.</p>
-
-      <form class="form-grid" id="contactForm" action="https://formspree.io/f/xdenlpno" method="POST">
-        <div class="form-row">
-          <div class="field"><label for="fName">Name</label><input type="text" id="fName" name="name" required></div>
-          <div class="field"><label for="fEmail">Email</label><input type="email" id="fEmail" name="email" required></div>
-        </div>
-        <div class="field"><label for="fMarket">Which market?</label><input type="text" id="fMarket" name="market" placeholder="e.g. South Africa, Portugal, Malta…" required></div>
-        <div class="field"><label for="fMsg">The product or opportunity</label><textarea id="fMsg" name="message" required></textarea></div>
-        <input type="hidden" name="_subject" value="New iConnect enquiry">
-        <div>
-          <button type="submit" class="btn btn-gold" id="formSubmitBtn">Send To Grant</button>
-          <p class="form-msg" id="formMsg"></p>
-        </div>
-      </form>
+  <div class="container">
+    <div class="head-row reveal" style="margin-bottom:20px;">
+      <p class="eyebrow">Our Markets</p>
+      <h2 class="h-section" style="margin-bottom:10px;">Where we've opened the book</h2>
+      <p class="lede">Select a market to see when we got there.</p>
     </div>
 
-    <div class="reveal reveal-delay-2 contact-mini">
-      <div class="row"><div class="k">Founder &amp; Principal Consultant</div><div class="v">Grant Neal</div></div>
-      <div class="row"><div class="k">Email</div><div class="v"><a href="mailto:grant@iconnectpartners.com">grant@iconnectpartners.com</a></div></div>
-      <div class="row"><div class="k">LinkedIn</div><div class="v"><a href="https://www.linkedin.com/in/grant-jason-neal-07889126/" target="_blank" rel="noopener">linkedin.com/in/grant-jason-neal</a></div></div>
+    <div class="markets-map-wrap reveal reveal-delay-2">
+      <div class="hero-visual markets-hero-visual">
+        <svg class="map-svg map-svg-lg" viewBox="0 0 800 467" xmlns="http://www.w3.org/2000/svg">
+          <g id="mapParallax">
+            <g id="mapDots"></g>
+            <g id="mapArcs"></g>
+            <g id="mapPins"></g>
+          </g>
+        </svg>
+      </div>
+      <div class="map-label markets-map-label" id="mapLabel">
+        <span class="mn">Malta</span>
+        <span class="my">Introduced 2023</span>
+        <span class="md">Headquarters — 20+ years of relationships start here.</span>
+      </div>
     </div>
   </div>
 </main>

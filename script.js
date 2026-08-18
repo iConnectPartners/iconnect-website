@@ -135,11 +135,11 @@
     }
     mapDotsG.appendChild(frag);
 
-    var hub = {name:'Malta', lon:14.5, lat:35.9, desc:'Headquarters — 20+ years of relationships start here.'};
+    var hub = {name:'Malta', lon:14.5, lat:35.9, year:2023, desc:'Headquarters — 20+ years of relationships start here.'};
     var markets = [
-      {name:'Portugal', lon:-9.1, lat:38.7, desc:'Expanding 2025/26.'},
-      {name:'South Africa', lon:18.4, lat:-33.9, desc:'Wholesale · Retail.'},
-      {name:'Africa', lon:31.0, lat:-17.8, desc:'Zimbabwe · Botswana · beyond.'},
+      {name:'Portugal', lon:-9.1, lat:38.7, year:2026, desc:'Expanding 2025/26.'},
+      {name:'South Africa', lon:18.4, lat:-33.9, year:2009, desc:'Wholesale · Retail.'},
+      {name:'Africa', lon:31.0, lat:-17.8, year:2024, desc:'Namibia, Botswana & Zimbabwe.'},
       {name:'Australia', lon:151.2, lat:-33.9, desc:'Active · Expanding.'}
     ];
 
@@ -151,6 +151,11 @@
     function showLabel(m){
       if(!label) return;
       label.querySelector('.mn').textContent = m.name;
+      var yearEl = label.querySelector('.my');
+      if(yearEl){
+        yearEl.textContent = m.year ? 'Introduced ' + m.year : '';
+        yearEl.style.display = m.year ? '' : 'none';
+      }
       label.querySelector('.md').textContent = m.desc;
       label.classList.add('is-active');
     }
@@ -260,7 +265,7 @@
       {name:'Service Partners', title:'Logistics, Finance, Legal & Marketing', desc:"Service businesses seeking introductions into new markets alongside the brands they serve."},
       {name:'Capital', title:'Investors & Entrepreneurs', desc:"Investors and entrepreneurs seeking cross-border commercial opportunities."}
     ];
-    var ncx=210, ncy=210, nr=160;
+    var ncx=230, ncy=230, nr=165;
     var ns = 'http://www.w3.org/2000/svg';
     var netItems = [];
     var lockedIndex = 0;
@@ -294,7 +299,7 @@
       g.setAttribute('class','net-node');
       g.setAttribute('tabindex','0');
       var circle = document.createElementNS(ns,'circle');
-      circle.setAttribute('cx',x);circle.setAttribute('cy',y);circle.setAttribute('r',40);
+      circle.setAttribute('cx',x);circle.setAttribute('cy',y);circle.setAttribute('r',52);
       g.appendChild(circle);
       var text = document.createElementNS(ns,'text');
       var words = d.name.split(' ');
