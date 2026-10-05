@@ -146,7 +146,6 @@
 
     // Land dots, evenly spaced over the sphere (generated once, re-projected as the globe turns)
     var landDots = [];
-    var dotsFrag = document.createDocumentFragment();
     var eqW = ne(1, 0)[0];
     var row = 0;
     for(var glat = LAT_BOTTOM; glat <= LAT_TOP; glat += 3.4, row++){
@@ -166,14 +165,34 @@
           }
         }
         if(hit){
-          var dot = document.createElementNS(ns,'circle');
-          dot.setAttribute('class','map-dot');
-          dotsFrag.appendChild(dot);
-          landDots.push({lon:dlon, lat:dlat, r:Math.random()*0.7 + 1.1, o:Math.random()*0.45 + 0.35, el:dot});
+          var pr = ne(1, dlat);
+          landDots.push({
+            lon:dlon,
+            fx:pr[0]*SX,
+            y0:(Y_TOP - ne(0, dlat)[1])*SY,
+            r:Math.random()*0.7 + 1.1,
+            o:Math.random()*0.45 + 0.35
+          });
         }
       }
     }
-    mapDotsG.appendChild(dotsFrag);
+
+    // Dots are drawn as a handful of batched paths (grouped by size + opacity) so the
+    // globe can be redrawn every frame without touching ~1000 separate elements.
+    var dotBuckets = {};
+    function bucketFor(rb, ob){
+      var key = rb + '_' + ob;
+      var b = dotBuckets[key];
+      if(!b){
+        var el = document.createElementNS(ns,'path');
+        el.setAttribute('class','map-dots-path');
+        el.setAttribute('stroke-width', (rb*0.3*2).toFixed(2));
+        el.setAttribute('stroke-opacity', (ob/10).toFixed(1));
+        mapDotsG.appendChild(el);
+        b = dotBuckets[key] = {el:el, d:[]};
+      }
+      return b;
+    }
 
     var hub = {name:'Portugal', lon:-9.1, lat:38.7, lab:'w'};
     var markets = [
@@ -224,6 +243,11 @@
       pinG.setAttribute('class','map-pin');
       pinG.setAttribute('tabindex','0');
       m.pinG = pinG;
+      var hit = document.createElementNS(ns,'circle');
+      hit.setAttribute('class','map-hit');
+      hit.setAttribute('r',16);
+      m.hit = hit;
+      pinG.appendChild(hit);
       m.halo = document.createElementNS(ns,'circle');
       m.halo.setAttribute('r',7.5);
       m.halo.setAttribute('class','map-pin-halo pulse');
@@ -249,12 +273,18 @@
       }
       pinG.addEventListener('mouseenter', activate);
       pinG.addEventListener('focus', activate);
-      pinG.addEventListener('click', function(){ activate(); centerOn(m); });
+      function select(){ activate(); centerOn(m); }
+      pinG.addEventListener('pointerdown', function(ev){ if(ev.button === 0 || ev.pointerType !== 'mouse'){ select(); } });
+      pinG.addEventListener('keydown', function(ev){ if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); select(); } });
       if(i===0){ activate(); }
     });
 
     var hubG = document.createElementNS(ns,'g');
     hubG.setAttribute('class','map-hub');
+    var hubHit = document.createElementNS(ns,'circle');
+    hubHit.setAttribute('class','map-hit');
+    hubHit.setAttribute('r',18);
+    hubG.appendChild(hubHit);
     var hubHalo = document.createElementNS(ns,'circle');
     hubHalo.setAttribute('r',9.5);
     hubHalo.setAttribute('class','map-hub-halo pulse');
@@ -268,21 +298,28 @@
     hubLbl.textContent = 'Portugal · HQ';
     hubG.appendChild(hubLbl);
     hubG.addEventListener('mouseenter', function(){ showLabel(hub); });
-    hubG.addEventListener('click', function(){ showLabel(hub); centerOn(hub); });
+    hubG.setAttribute('tabindex','0');
+    function selectHub(){ showLabel(hub); centerOn(hub); }
+    hubG.addEventListener('pointerdown', function(ev){ if(ev.button === 0 || ev.pointerType !== 'mouse'){ selectHub(); } });
+    hubG.addEventListener('keydown', function(ev){ if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); selectHub(); } });
     pinsG.appendChild(hubG);
 
     function layout(){
-      landDots.forEach(function(d){
-        var p = project(d.lon, d.lat);
-        var t = Math.abs(p[2]) / 180;
+      var cxm = W/2, vy = state.vy, l0 = state.l0, key;
+      for(key in dotBuckets){ dotBuckets[key].d.length = 0; }
+      for(var di = 0; di < landDots.length; di++){
+        var d = landDots[di];
+        var dl = wrapLon(d.lon - l0);
+        var t = dl < 0 ? -dl/180 : dl/180;
         var e = t*t;
-        d.el.setAttribute('cx', p[0].toFixed(1));
-        d.el.setAttribute('cy', p[1].toFixed(1));
-        d.el.setAttribute('r', (d.r * (1 - 0.4*e)).toFixed(2));
-        d.el.setAttribute('opacity', (d.o * (1 - 0.8*e)).toFixed(2));
-      });
+        var rb = Math.max(2, Math.round(d.r*(1 - 0.4*e) / 0.3));
+        var ob = Math.max(1, Math.round(d.o*(1 - 0.8*e) * 10));
+        bucketFor(rb, ob).d.push('M' + (cxm + dl*d.fx).toFixed(1) + ' ' + (d.y0 + vy).toFixed(1) + 'h.01');
+      }
+      for(key in dotBuckets){ dotBuckets[key].el.setAttribute('d', dotBuckets[key].d.join('')); }
 
       var hxy = project(hub.lon, hub.lat);
+      setXY(hubHit, hxy[0], hxy[1]);
       setXY(hubHalo, hxy[0], hxy[1]);
       setXY(hubCore, hxy[0], hxy[1]);
       placeLabel(hubLbl, hxy[0], hxy[1], hub.lab, 2);
@@ -301,6 +338,7 @@
         m.arc.setAttribute('d', d);
         m.arcGlow.setAttribute('d', d);
         m.arc.style.display = m.arcGlow.style.display = far ? 'none' : '';
+        setXY(m.hit, x2, y2);
         setXY(m.halo, x2, y2);
         setXY(m.core, x2, y2);
         placeLabel(m.lbl, x2, y2, m.lab);
@@ -318,11 +356,11 @@
       var toV = -(targetY - H/2) * 0.45;
       if(turnFrame) cancelAnimationFrame(turnFrame);
       if(reduceMotion){ state.l0 = fromL + dL; state.vy = toV; layout(); return; }
-      var t0 = null, dur = 950;
+      var t0 = null, dur = 700;
       function step(ts){
         if(t0 === null) t0 = ts;
         var k = Math.min((ts - t0) / dur, 1);
-        var e = k < 0.5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3)/2;
+        var e = 1 - Math.pow(1 - k, 3);
         state.l0 = fromL + dL*e;
         state.vy = fromV + (toV - fromV)*e;
         layout();
