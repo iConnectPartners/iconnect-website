@@ -400,3 +400,5 @@ p{font-weight:300;line-height:1.65;}
   .lb-gallery img{height:auto;aspect-ratio:4/3;}
 }
 .lb-hero .h-display em{color:var(--gold);font-style:normal;}
+.lb-media-pair{align-items:start;}
+.lb-media-pair img{aspect-ratio:4/5;object-fit:cover;object-position:center;}
