@@ -357,6 +357,8 @@
     bind('br_email', snap.email);
     bind('br_phone', snap.phone);
     bind('effective', signed ? fmtDate(signed.signed_at) : 'The date you sign');
+    bind('agr_ref', signed ? 'IC-' + String(signed.id).replace(/-/g, '').slice(0, 8).toUpperCase() : 'Issued on signing');
+    bind('agr_ver', sel.version);
 
     // clauses with blanks
     bind('days', sel.assetsWithinDays);
@@ -368,6 +370,9 @@
     ['none', 'fee', 'separate'].forEach(function(o){ $('fee_' + o).checked = (fee.option === o); });
     bind('fee_amount', fee.amount); bind('fee_currency', fee.currency);
     bind('fee_per', fee.per); bind('fee_invoiced', fee.invoiced); bind('fee_sepdate', fee.separateDate);
+    ['fee_amount', 'fee_currency', 'fee_per', 'fee_invoiced', 'fee_sepdate'].forEach(function(k){
+      document.querySelectorAll('[data-b="' + k + '"]').forEach(function(el){ if(el.textContent === '—') el.textContent = '________'; });
+    });
 
     // channels + territory
     var boxes = document.querySelectorAll('input[name="ch"]');
