@@ -581,3 +581,24 @@ body[data-page="portal"]{page:agreement;}
   .agr-sigs{break-inside:avoid;margin-top:2mm;}
   .agr-foot{margin-top:8mm;font-size:9pt;color:#777;}
 }
+
+/* ============ PORTAL: AGREEMENTS LIST, ADMIN ============ */
+.field select{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line-on-cream);padding:10px 0;font:inherit;font-size:15px;color:var(--black);border-radius:0;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23C9A227' stroke-width='1.6'/></svg>");background-repeat:no-repeat;background-position:right 2px center;padding-right:22px;}
+.field select:focus{outline:none;border-color:var(--gold);}
+.has-custom-cursor select{cursor:none;}
+.agr-back{display:inline-block;margin-bottom:18px;font-family:var(--font-head);font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);}
+.agr-back:hover{color:var(--gold);}
+.agr-card .agr-go{display:block;margin-top:14px;font-family:var(--font-head);font-weight:700;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+.status.wait{color:var(--grey);border-color:var(--line-on-cream);}
+.signed-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.admin-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:34px;align-items:start;}
+@media(max-width:860px){.admin-cols{grid-template-columns:1fr;}}
+.admin-h{font-size:17px;margin:34px 0 12px;color:var(--black);}
+.portal-table td.actions{white-space:nowrap;}
+.portal-table td.actions .btn{margin-right:6px;}
+.invite-note{margin-bottom:18px;}
+body.viewer-admin .portal-head,body.viewer-admin .portal-tabs{display:none;}
+body.viewer-admin .portal{padding-top:28px;}
+@media print{.agr-back,#agrAdminPending,.signed-actions{display:none !important;}}
+.inv-agreements{margin:8px 0 4px;}
