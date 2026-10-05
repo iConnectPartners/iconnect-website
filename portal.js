@@ -650,12 +650,14 @@
 
       // invites
       var ib = $('inviteRows'); ib.textContent = '';
-      data.invites.forEach(function(i){
+      // once an invited person registers they become a partner and drop off this list
+      var pending = data.invites.filter(function(i){ return !i.accepted_at; });
+      pending.forEach(function(i){
         var tr = document.createElement('tr');
         cell(tr, i.company_name || '—');
         cell(tr, [i.contact_name, i.email].filter(Boolean).join('\n'), 'pre');
         cell(tr, (i.agreements && i.agreements.length) ? i.agreements.map(function(a){ return templateTitle(a.template); }).join('\n') : '—', 'pre');
-        cell(tr, i.accepted_at ? 'Registered' : 'Invited ' + fmtDate(i.created_at), i.accepted_at ? 'ok' : 'todo');
+        cell(tr, 'Invited ' + fmtDate(i.created_at), 'todo');
         var c = document.createElement('td');
         if(!i.accepted_at){
           c.appendChild(btn('Resend', 'btn-outline', async function(ev){
@@ -665,7 +667,7 @@
         }
         tr.appendChild(c); ib.appendChild(tr);
       });
-      if(!data.invites.length) emptyRow(ib, 5, 'No invitations sent yet.');
+      if(!pending.length) emptyRow(ib, 5, 'No pending invites.');
 
       // agreements
       var ab = $('agreementRows'); ab.textContent = '';
