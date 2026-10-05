@@ -629,23 +629,109 @@
       return p ? (p.company_name || p.email) : 'Unknown';
     }
 
+    var expanded = {};   // partner ids whose detail panel is open (kept across refreshes)
+
+    function summarise(list){
+      if(!list.length) return {key: '', label: 'None sent'};
+      var needs = list.filter(function(a){ return a.status === 'signed' && !a.countersigned_at; }).length;
+      var waiting = list.filter(function(a){ return a.status !== 'signed'; }).length;
+      var tail = list.length > 1 ? ' (' + list.length + ')' : '';
+      if(needs) return {key: 'todo', label: 'Signed: needs your countersignature' + tail};
+      if(waiting) return {key: 'todo', label: 'Awaiting partner signature' + tail};
+      return {key: 'ok', label: 'Fully signed' + tail};
+    }
+
+    function dlRows(rows){
+      var dl = document.createElement('dl'); dl.className = 'lb-notes';
+      rows.forEach(function(r){
+        var d = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd');
+        dt.textContent = r[0]; dd.textContent = r[1] || '—'; d.appendChild(dt); d.appendChild(dd); dl.appendChild(d);
+      });
+      return dl;
+    }
+
+    function buildDetail(p, mine){
+      var wrap = document.createElement('div'); wrap.className = 'partner-detail';
+
+      var left = document.createElement('div');
+      var h1 = document.createElement('h4'); h1.textContent = 'Captured details'; left.appendChild(h1);
+      left.appendChild(dlRows([
+        ['Company', p.company_name], ['Trading names', p.trading_names], ['Registration no.', p.reg_no],
+        ['Address', p.address], ['Contact', [p.contact_name, p.contact_title].filter(Boolean).join(', ')],
+        ['Email', p.email], ['Phone', p.phone], ['Website', p.website],
+        ['Products', p.product_categories], ['Sells in today', p.current_markets],
+        ['Wants to enter', p.target_markets], ['Notes', p.notes],
+        ['Registered', p.created_at ? fmtDate(p.created_at) : '']
+      ]));
+
+      var right = document.createElement('div');
+      var h2 = document.createElement('h4'); h2.textContent = 'Agreements'; right.appendChild(h2);
+      if(!mine.length){
+        var none = document.createElement('p'); none.className = 'form-note'; none.textContent = 'No agreements sent to this partner yet. Use "Send an agreement" above.';
+        right.appendChild(none);
+      }
+      mine.forEach(function(a){
+        var card = document.createElement('div'); card.className = 'mini-agr';
+        var t = document.createElement('p'); t.className = 'mini-agr-title'; t.textContent = templateTitle(a.template) + '  ·  v' + a.version;
+        var st = document.createElement('p');
+        var state = a.status !== 'signed' ? {k: 'todo', t: 'Sent ' + fmtDate(a.sent_at) + '. Awaiting partner signature.'}
+                  : a.countersigned_at ? {k: 'ok', t: 'Fully signed. Countersigned ' + fmtDate(a.countersigned_at) + ' by ' + a.countersigned_by + '.'}
+                  : {k: 'todo', t: 'Signed ' + fmtDateTime(a.signed_at) + ' by ' + a.signer_name + ', ' + a.signer_title + '. Awaiting your countersignature.'};
+        st.className = 'mini-agr-state ' + state.k; st.textContent = state.t;
+        var act = document.createElement('div'); act.className = 'mini-agr-actions';
+        act.appendChild(link(a.status === 'signed' ? 'View / download' : 'View', 'portal.html#agreement/' + a.id));
+        if(a.status === 'signed' && !a.countersigned_at){
+          act.appendChild(btn('Countersign', 'btn-gold', async function(ev){
+            var b = ev.currentTarget; b.disabled = true;
+            try{ await api.countersign(a.id); await load(); }catch(err){ alert(cleanError(err)); b.disabled = false; }
+          }));
+        }
+        card.appendChild(t); card.appendChild(st); card.appendChild(act); right.appendChild(card);
+      });
+
+      wrap.appendChild(left); wrap.appendChild(right);
+      return wrap;
+    }
+
     async function load(){
       data = await api.adminList();
       var partners = data.partners.filter(function(p){ return !p.is_admin; });
 
-      // partners
+      // partners, with their captured details and agreements one click away
       var tb = $('adminRows'); tb.textContent = '';
       partners.forEach(function(p){
-        var tr = document.createElement('tr');
-        cell(tr, p.company_name || '(not set)');
+        var mine = data.agreements.filter(function(a){ return a.partner_id === p.id; });
+        var sum = summarise(mine);
+        var open = !!expanded[p.id];
+
+        var tr = document.createElement('tr'); tr.className = 'partner-row' + (open ? ' is-open' : '');
+        var c0 = document.createElement('td');
+        var tg = document.createElement('button');
+        tg.type = 'button'; tg.className = 'row-toggle'; tg.setAttribute('aria-expanded', open ? 'true' : 'false');
+        tg.setAttribute('aria-label', 'Show details for ' + (p.company_name || p.email));
+        tg.textContent = p.company_name || '(not set)';
+        c0.appendChild(tg); tr.appendChild(c0);
         cell(tr, [p.contact_name, p.email].filter(Boolean).join('\n'), 'pre');
         var ok = detailsComplete(p);
         cell(tr, ok ? 'Complete' : 'Incomplete', ok ? 'ok' : 'todo');
-        var n = data.agreements.filter(function(a){ return a.partner_id === p.id; }).length;
-        cell(tr, n ? n + (n === 1 ? ' agreement' : ' agreements') : 'None sent');
+        cell(tr, sum.label, sum.key);
+        var c4 = document.createElement('td'); c4.className = 'chev'; c4.setAttribute('aria-hidden', 'true'); c4.textContent = open ? '−' : '+'; tr.appendChild(c4);
         tb.appendChild(tr);
+
+        var dr = document.createElement('tr'); dr.className = 'partner-detail-row'; dr.hidden = !open;
+        var dc = document.createElement('td'); dc.colSpan = 5;
+        dc.appendChild(buildDetail(p, mine));
+        dr.appendChild(dc); tb.appendChild(dr);
+
+        function toggle(){
+          var now = dr.hidden;           // currently closed -> open it
+          dr.hidden = !now; expanded[p.id] = now;
+          tr.classList.toggle('is-open', now); tg.setAttribute('aria-expanded', now ? 'true' : 'false'); c4.textContent = now ? '−' : '+';
+        }
+        tg.addEventListener('click', toggle);
+        tr.addEventListener('click', function(ev){ if(ev.target !== tg) toggle(); });
       });
-      if(!partners.length) emptyRow(tb, 4, 'No partners have registered yet.');
+      if(!partners.length) emptyRow(tb, 5, 'No partners have registered yet.');
 
       // partner dropdown for sending agreements
       var sel = $('sendPartner'); var keep = sel.value; sel.textContent = '';
@@ -678,27 +764,6 @@
       });
       if(!pending.length) emptyRow(ib, 5, 'No pending invites.');
 
-      // agreements
-      var ab = $('agreementRows'); ab.textContent = '';
-      data.agreements.forEach(function(a){
-        var tr = document.createElement('tr');
-        cell(tr, partnerName(a.partner_id));
-        cell(tr, templateTitle(a.template) + '\nv' + a.version, 'pre');
-        var st = a.status !== 'signed' ? 'Sent ' + fmtDate(a.sent_at) + '\nAwaiting partner signature'
-               : (a.countersigned_at ? 'Fully signed\n' + fmtDate(a.countersigned_at) : 'Signed ' + fmtDate(a.signed_at) + '\nAwaiting countersignature');
-        cell(tr, st, (a.countersigned_at ? 'ok' : 'todo') + ' pre');
-        cell(tr, a.signer_name ? a.signer_name + ', ' + a.signer_title : '—');
-        var c = document.createElement('td'); c.className = 'actions';
-        c.appendChild(link(a.status === 'signed' ? 'View / download' : 'View', 'portal.html#agreement/' + a.id));
-        if(a.status === 'signed' && !a.countersigned_at){
-          c.appendChild(btn('Countersign', 'btn-gold', async function(ev){
-            var b = ev.currentTarget; b.disabled = true;
-            try{ await api.countersign(a.id); await load(); }catch(err){ alert(cleanError(err)); b.disabled = false; }
-          }));
-        }
-        tr.appendChild(c); ab.appendChild(tr);
-      });
-      if(!data.agreements.length) emptyRow(ab, 5, 'No agreements sent yet.');
     }
 
     $('inviteForm').addEventListener('submit', async function(e){
@@ -732,6 +797,7 @@
       try{
         await api.sendAgreement(pid, tpl, t.version, t);
         msg('sendMsg', 'Agreement sent to ' + partnerName(pid) + '. They have been emailed.', true);
+        expanded[pid] = true;
         await load();
       }catch(err){
         msg('sendMsg', /already been sent|duplicate|unique/i.test(err.message) ? 'That agreement has already been sent to this partner.' : cleanError(err));

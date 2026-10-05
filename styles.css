@@ -602,3 +602,27 @@ body.viewer-admin .portal-head,body.viewer-admin .portal-tabs{display:none;}
 body.viewer-admin .portal{padding-top:28px;}
 @media print{.agr-back,#agrAdminPending,.signed-actions{display:none !important;}}
 .inv-agreements{margin:8px 0 4px;}
+
+/* ============ ADMIN: PARTNER ROWS WITH EXPANDABLE DETAIL ============ */
+.partner-row{cursor:pointer;transition:background .2s;}
+.partner-row:hover{background:#faf6e8;}
+.partner-row.is-open{background:#faf6e8;}
+.row-toggle{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--black);text-align:left;cursor:pointer;}
+.has-custom-cursor .row-toggle,.has-custom-cursor .partner-row{cursor:none;}
+.row-toggle:hover{color:#8a6a10;}
+.portal-table td.chev{text-align:right;width:36px;font-size:20px;line-height:1;color:var(--gold);}
+.partner-detail-row > td{background:#faf6e8;border-bottom:1px solid var(--line-on-cream);padding:0 !important;}
+.partner-detail{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;padding:22px 22px 26px;}
+@media(max-width:860px){.partner-detail{grid-template-columns:1fr;gap:22px;}}
+.partner-detail h4{font-family:var(--font-head);font-weight:800;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.partner-detail .lb-notes{max-width:none;border-top-color:var(--line-on-cream);}
+.partner-detail .lb-notes div{grid-template-columns:140px 1fr;padding:9px 0;border-bottom-color:var(--line-on-cream);}
+.partner-detail .lb-notes dt{padding-top:2px;}
+.partner-detail .lb-notes dd{color:var(--black);word-break:break-word;white-space:pre-line;}
+@media(max-width:560px){.partner-detail .lb-notes div{grid-template-columns:1fr;gap:3px;}}
+.mini-agr{background:var(--white);border:1px solid var(--line-on-cream);padding:16px 18px;margin-bottom:12px;}
+.mini-agr-title{font-weight:700;font-size:14px;margin-bottom:6px;color:var(--black);}
+.mini-agr-state{font-size:13px;line-height:1.5;margin-bottom:12px;}
+.mini-agr-state.ok{color:#2f6b3a;}
+.mini-agr-state.todo{color:#8a6a10;}
+.mini-agr-actions{display:flex;gap:8px;flex-wrap:wrap;}
