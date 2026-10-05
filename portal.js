@@ -416,8 +416,17 @@
       msg('companyMsg', 'Saving…', true);
       try{
         profile = await api.saveProfile(f);
-        msg('companyMsg', 'Saved.', true);
         renderOverview();
+        if(!detailsComplete(profile)){
+          msg('companyMsg', 'Saved. Fill in every field marked * to continue to your agreement.', true);
+          return;
+        }
+        // details are complete: carry on to the agreement waiting to be signed
+        myAgreements = await api.myAgreements();
+        var waiting = myAgreements.filter(function(a){ return a.status !== 'signed'; });
+        if(waiting.length === 1){ msg('companyMsg', 'Saved. Opening your agreement…', true); location.hash = '#agreement/' + waiting[0].id; }
+        else if(waiting.length > 1){ msg('companyMsg', 'Saved. Opening your agreements…', true); location.hash = '#agreements'; }
+        else{ msg('companyMsg', 'Saved. iConnect will send you your agreement here to sign.', true); renderOverview(); }
       }catch(err){ msg('companyMsg', cleanError(err)); }
     });
   }
