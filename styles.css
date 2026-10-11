@@ -626,3 +626,39 @@ body.viewer-admin .portal{padding-top:28px;}
 .mini-agr-state.ok{color:#2f6b3a;}
 .mini-agr-state.todo{color:#8a6a10;}
 .mini-agr-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ============ BRAND PAGES: SPLIT HERO, CARDS, RELEASES ============ */
+.lb-split-hero{background:var(--black);}
+.lb-split{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding-top:clamp(40px,6vw,72px);padding-bottom:clamp(40px,6vw,72px);}
+.lb-split-copy .lb-back{margin-bottom:26px;}
+.lb-split-copy .lede{max-width:520px;margin-top:18px;}
+.lb-split-copy .h-display em{color:var(--gold);font-style:normal;}
+.lb-split-media{min-width:0;}
+.lb-split-media img{width:100%;height:auto;display:block;}
+.lb-split-media.is-emblem{display:flex;justify-content:center;align-items:center;padding:clamp(10px,3vw,40px);}
+.lb-split-media.is-emblem img{max-width:520px;}
+@media(max-width:900px){.lb-split{grid-template-columns:1fr;gap:28px;}.lb-split-media{order:-1;}.lb-split-media.is-emblem img{max-width:300px;}}
+
+.lb-media img.sq{aspect-ratio:1/1;object-fit:cover;}
+.lb-media img.pt{aspect-ratio:4/5;object-fit:cover;}
+.lb-spec{display:block;margin-top:18px;font-size:12.5px;letter-spacing:.02em;color:var(--grey-mid);}
+.lb-serve{margin-top:16px;font-size:14px;line-height:1.65;color:var(--grey-on-black);max-width:520px;}
+.lb-serve b{color:var(--cream);font-weight:600;}
+
+.lb-cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+@media(max-width:900px){.lb-cards3{grid-template-columns:1fr;}}
+.lb-card{background:rgba(246,239,218,.04);border:1px solid var(--line-gold-black);min-width:0;}
+.lb-card img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover;}
+.lb-card-body{padding:22px 22px 24px;}
+.lb-card-body h3{font-size:19px;margin-bottom:8px;}
+.lb-card-body .lb-tagline{font-size:13.5px;color:var(--grey-on-black);margin-bottom:14px;}
+.lb-card .lb-notes{margin-top:8px;}
+.lb-card .lb-notes div{grid-template-columns:66px 1fr;padding:9px 0;}
+.lb-card .lb-notes dd{font-size:13px;}
+
+.lb-releases{margin-top:22px;max-width:520px;border-top:1px solid var(--line-gold-black);}
+.lb-release{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line-gold-black);font-size:14px;}
+.lb-release b{color:var(--cream);font-weight:600;}
+.lb-release span{color:var(--grey-on-black);text-align:right;}
+@media(max-width:520px){.lb-release{flex-direction:column;gap:2px;}.lb-release span{text-align:left;}}
+.lb-quiet{background-color:var(--black-soft);}
